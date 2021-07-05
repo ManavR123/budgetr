@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Main from "./Main.js";
 
 import Amplify, { Auth } from "aws-amplify";
 import awsconfig from "./aws-exports";
 Amplify.configure(awsconfig);
-import { withAuthenticator, AmplifySignOut } from "@aws-amplify/ui-react";
+import { AmplifySignOut, AmplifyAuthenticator } from "@aws-amplify/ui-react";
+import { onAuthUIStateChange } from "@aws-amplify/ui-components";
 
 const styles = {
   app: {
     textAlign: "center",
+  },
+  auth: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "500px",
   },
   signOut: {
     position: "fixed",
@@ -20,7 +27,7 @@ const styles = {
 function App() {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  onAuthUIStateChange(() => {
     Auth.currentUserInfo().then((user) => setUser(user));
   }, []);
 
@@ -30,9 +37,15 @@ function App() {
       <div style={styles.signOut}>
         <AmplifySignOut />
       </div>
-      {user ? <Main /> : null}
+      {user == null ? (
+        <div style={styles.auth}>
+          <AmplifyAuthenticator />
+        </div>
+      ) : (
+        <Main user={user} />
+      )}
     </div>
   );
 }
 
-export default withAuthenticator(App);
+export default App;
