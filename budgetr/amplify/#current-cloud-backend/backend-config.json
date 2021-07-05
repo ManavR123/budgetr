@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "budgetr2ea02f3c": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}
