@@ -1,4 +1,3 @@
-#include <memory> // std::auto_ptr
 #include <iostream>
 #include <string>
 
@@ -18,7 +17,7 @@ using namespace odb::core;
 
 int main(int argc, char *argv[])
 {
-    auto_ptr<database> db(create_database(argc, argv));
+    unique_ptr<database> db(create_database(argc, argv));
     crow::SimpleApp app;
 
     CROW_ROUTE(app, "/")
