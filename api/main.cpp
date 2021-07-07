@@ -29,6 +29,16 @@ std::vector<string> get_all_categories(unique_ptr<database> &db,
   return categories;
 }
 
+date string_to_dat(const std::string &str) {
+  const std::locale fmt2(std::locale::classic(),
+                         new boost::gregorian::date_input_facet("%m/%d/%Y"));
+  std::istringstream is(str);
+  is.imbue(fmt2);
+  boost::gregorian::date date;
+  is >> date;
+  return date;
+}
+
 int main(int argc, char *argv[]) {
   unique_ptr<database> db(create_database(argc, argv));
   crow::SimpleApp app;
@@ -63,6 +73,21 @@ int main(int argc, char *argv[]) {
         crow::json::wvalue ret;
         ret["categories"] = get_all_categories(db, body["username"].s());
         return ret;
+      });
+
+  CROW_ROUTE(app, "/add_purchase")
+      .methods("POST"_method)([&](const crow::request &req) {
+        auto body = crow::json::load(req.body);
+        if (!body)
+          return crow::response(400, "Body-Is-Empty");
+
+        purchase p(body["username"].s(), body["location"].s(),
+                   body["category"].s(), body["amount"].d(), body["notes"].s(),
+                   string_to_dat(body["date"].s()));
+        transaction t(db->begin());
+        db->persist(p);
+        t.commit();
+        return crow::response(200);
       });
 
   app.port(8080).multithreaded().run();
