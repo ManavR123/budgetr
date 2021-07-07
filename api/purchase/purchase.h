@@ -36,6 +36,8 @@ public:
   const date &get_date() { return date_; }
   void set_date(const date &date) { date_ = date; }
 
+  unsigned long get_id() { return id_; }
+
 private:
   friend class odb::access;
   purchase() {}

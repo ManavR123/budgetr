@@ -148,12 +148,14 @@ int main(int argc, char *argv[]) {
 
         std::vector<string> locations, categories, notes, dates;
         std::vector<float> amounts;
+        std::vector<unsigned long> ids;
         for (result::iterator p(r.begin()); p != r.end(); ++p) {
           dates.push_back(format_date(p->get_date()));
           locations.push_back(p->get_location());
           categories.push_back(p->get_category());
           notes.push_back(p->get_notes());
           amounts.push_back(p->get_amount());
+          ids.push_back(p->get_id());
         }
 
         crow::json::wvalue ret;
@@ -162,6 +164,7 @@ int main(int argc, char *argv[]) {
         ret["categories"] = categories;
         ret["amounts"] = amounts;
         ret["notes"] = notes;
+        ret["ids"] = ids;
         return crow::response(200, ret);
       });
 

@@ -45,10 +45,11 @@ function SpendingTable({ user, startDate, endDate, update }) {
     })
       .then((response) => {
         response.json().then((purchase_data) => {
-          const { notes, amounts, categories, dates, locations } =
+          const { ids, notes, amounts, categories, dates, locations } =
             purchase_data;
           setRows(
             [...Array(amounts.length).keys()].map((i) => ({
+              id: ids[i],
               notes: notes[i],
               amount: amounts[i],
               category: categories[i],
