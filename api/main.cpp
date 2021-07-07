@@ -14,6 +14,7 @@
 
 using namespace std;
 using namespace odb::core;
+using boost::gregorian::date;
 
 std::vector<string> get_all_categories(unique_ptr<database> &db,
                                        const std::string &username) {
@@ -29,14 +30,23 @@ std::vector<string> get_all_categories(unique_ptr<database> &db,
   return categories;
 }
 
-date string_to_dat(const std::string &str) {
+date string_to_date(const std::string &str) {
   const std::locale fmt2(std::locale::classic(),
                          new boost::gregorian::date_input_facet("%m/%d/%Y"));
   std::istringstream is(str);
   is.imbue(fmt2);
-  boost::gregorian::date date;
+  date date;
   is >> date;
   return date;
+}
+
+const std::string formatDate(date date) {
+  const std::locale fmt(std::locale::classic(),
+                        new boost::gregorian::date_facet("%m/%d/%Y"));
+  std::ostringstream os;
+  os.imbue(fmt);
+  os << date;
+  return os.str();
 }
 
 int main(int argc, char *argv[]) {
@@ -95,11 +105,39 @@ int main(int argc, char *argv[]) {
 
         purchase p(body["username"].s(), body["location"].s(),
                    body["category"].s(), body["amount"].d(), body["notes"].s(),
-                   string_to_dat(body["date"].s()));
+                   string_to_date(body["date"].s()));
         transaction t(db->begin());
         db->persist(p);
         t.commit();
         return crow::response(200);
+      });
+
+  CROW_ROUTE(app, "/get_purchases")
+      .methods("POST"_method)([&](const crow::request &req) {
+        auto body = crow::json::load(req.body);
+
+        typedef odb::query<purchase> query;
+        typedef odb::result<purchase> result;
+        transaction t(db->begin());
+        result r(db->query<purchase>(query::username == body["username"].s()));
+
+        std::vector<string> locations, categories, notes, dates;
+        std::vector<float> amounts;
+        for (result::iterator p(r.begin()); p != r.end(); ++p) {
+          dates.push_back(formatDate(p->get_date()));
+          locations.push_back(p->get_location());
+          categories.push_back(p->get_category());
+          notes.push_back(p->get_notes());
+          amounts.push_back(p->get_amount());
+        }
+
+        crow::json::wvalue ret;
+        ret["dates"] = dates;
+        ret["locations"] = locations;
+        ret["categories"] = categories;
+        ret["amounts"] = amounts;
+        ret["notes"] = notes;
+        return ret;
       });
 
   app.port(8080).multithreaded().run();
