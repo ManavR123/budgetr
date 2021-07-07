@@ -8,7 +8,7 @@ const styles = {
   },
 };
 
-function Chart({ user, startDate, endDate }) {
+function Chart({ user, startDate, endDate, update }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -33,12 +33,11 @@ function Chart({ user, startDate, endDate }) {
               value: amounts[i],
               color: randomColor(),
             })),
-            console.log(purchase_data),
           );
         });
       })
       .catch((error) => console.log(error));
-  }, [startDate, endDate]);
+  }, [startDate, endDate, update]);
 
   return (
     <PieChart
@@ -53,9 +52,11 @@ function Chart({ user, startDate, endDate }) {
     >
       <text fontSize="6px" textAnchor="middle" x="50" y="32">
         $
-        {data.reduce((total, el) => {
-          return total + el.value;
-        }, 0)}
+        {data
+          .reduce((total, el) => {
+            return total + el.value;
+          }, 0)
+          .toFixed(2)}
       </text>
     </PieChart>
   );
