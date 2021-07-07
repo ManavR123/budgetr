@@ -140,5 +140,28 @@ int main(int argc, char *argv[]) {
         return ret;
       });
 
+  CROW_ROUTE(app, "/get_total_purchases")
+      .methods("POST"_method)([&](const crow::request &req) {
+        auto body = crow::json::load(req.body);
+
+        typedef odb::query<purchase_stat> query;
+        typedef odb::result<purchase_stat> result;
+        transaction t(db->begin());
+        result r(
+            db->query<purchase_stat>(query::username == body["username"].s()));
+
+        std::vector<string> categories;
+        std::vector<float> amounts;
+        for (result::iterator p(r.begin()); p != r.end(); ++p) {
+          categories.push_back(p->category);
+          amounts.push_back(p->total_amount);
+        }
+
+        crow::json::wvalue ret;
+        ret["categories"] = categories;
+        ret["amounts"] = amounts;
+        return ret;
+      });
+
   app.port(8080).multithreaded().run();
 }

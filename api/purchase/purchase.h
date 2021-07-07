@@ -51,4 +51,13 @@ private:
   date date_;
 };
 
+#pragma db view object(purchase) query((?) + "GROUP BY" + purchase::category_)
+struct purchase_stat {
+#pragma db column(purchase::category_)
+  std::string category;
+
+#pragma db column("sum(" + purchase::amount_ + ")")
+  float total_amount;
+};
+
 #endif // PURCHASE_H
