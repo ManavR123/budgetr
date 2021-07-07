@@ -81,6 +81,18 @@ int main(int argc, char *argv[]) {
         if (!body)
           return crow::response(400, "Body-Is-Empty");
 
+        bool found = false;
+        auto categories = get_all_categories(db, body["username"].s());
+        for (std::vector<string>::iterator cat(categories.begin());
+             cat != categories.end(); ++cat) {
+          if (cat->compare(body["category"].s()) == 0) {
+            found = true;
+          }
+        }
+
+        if (!found)
+          return crow::response(400, "Category-Does-Not-Exist");
+
         purchase p(body["username"].s(), body["location"].s(),
                    body["category"].s(), body["amount"].d(), body["notes"].s(),
                    string_to_dat(body["date"].s()));
