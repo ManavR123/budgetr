@@ -1,4 +1,5 @@
 #include <iostream>
+#include <regex>
 #include <string>
 
 #include <odb/database.hxx>
@@ -40,13 +41,22 @@ date string_to_date(const std::string &str) {
   return date;
 }
 
-const std::string formatDate(date date) {
+const std::string format_date(date date) {
   const std::locale fmt(std::locale::classic(),
                         new boost::gregorian::date_facet("%m/%d/%Y"));
   std::ostringstream os;
   os.imbue(fmt);
   os << date;
   return os.str();
+}
+
+bool is_date_string_valid(const std::string &str) {
+  regex p("(\\d\\d)/(\\d\\d)/(\\d\\d\\d\\d)");
+  smatch m;
+  if (regex_search(str, m, p) && m.size() > 3) {
+    return true;
+  }
+  return false;
 }
 
 int main(int argc, char *argv[]) {
@@ -118,13 +128,31 @@ int main(int argc, char *argv[]) {
 
         typedef odb::query<purchase> query;
         typedef odb::result<purchase> result;
+        const std::string username = body["username"].s();
+
+        date date1;
+        if (is_date_string_valid(body["date1"].s())) {
+          date1 = string_to_date(body["date1"].s());
+        } else {
+          return crow::response(400, "Date1-Format-Invalid");
+        }
+
+        date date2;
+        if (is_date_string_valid(body["date2"].s())) {
+          date2 = string_to_date(body["date2"].s());
+        } else {
+          return crow::response(400, "Date2-Format-Invalid");
+        }
+
         transaction t(db->begin());
-        result r(db->query<purchase>(query::username == body["username"].s()));
+        result r(db->query<purchase>(query::username == username &&
+                                     query::date >= date1 &&
+                                     query::date <= date2));
 
         std::vector<string> locations, categories, notes, dates;
         std::vector<float> amounts;
         for (result::iterator p(r.begin()); p != r.end(); ++p) {
-          dates.push_back(formatDate(p->get_date()));
+          dates.push_back(format_date(p->get_date()));
           locations.push_back(p->get_location());
           categories.push_back(p->get_category());
           notes.push_back(p->get_notes());
@@ -137,7 +165,7 @@ int main(int argc, char *argv[]) {
         ret["categories"] = categories;
         ret["amounts"] = amounts;
         ret["notes"] = notes;
-        return ret;
+        return crow::response(200, ret);
       });
 
   CROW_ROUTE(app, "/get_total_purchases")
@@ -146,9 +174,26 @@ int main(int argc, char *argv[]) {
 
         typedef odb::query<purchase_stat> query;
         typedef odb::result<purchase_stat> result;
+        const std::string username = body["username"].s();
+
+        date date1;
+        if (is_date_string_valid(body["date1"].s())) {
+          date1 = string_to_date(body["date1"].s());
+        } else {
+          return crow::response(400, "Date1-Format-Invalid");
+        }
+
+        date date2;
+        if (is_date_string_valid(body["date2"].s())) {
+          date2 = string_to_date(body["date2"].s());
+        } else {
+          return crow::response(400, "Date2-Format-Invalid");
+        }
+
         transaction t(db->begin());
-        result r(
-            db->query<purchase_stat>(query::username == body["username"].s()));
+        result r(db->query<purchase_stat>(query::username == username &&
+                                          query::date >= date1 &&
+                                          query::date <= date2));
 
         std::vector<string> categories;
         std::vector<float> amounts;
@@ -160,7 +205,7 @@ int main(int argc, char *argv[]) {
         crow::json::wvalue ret;
         ret["categories"] = categories;
         ret["amounts"] = amounts;
-        return ret;
+        return crow::response(200, ret);
       });
 
   app.port(8080).multithreaded().run();
