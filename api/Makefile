@@ -4,3 +4,7 @@ compile:
 
 run:
 	./main - --database budgetr --port 5433 --user manav
+
+purchase: purchase/purchase.h
+	odb -o purchase/ -d pgsql --profile boost  --generate-query --generate-schema purchase/purchase.h
+	c++ -c purchase/purchase-odb.cxx
