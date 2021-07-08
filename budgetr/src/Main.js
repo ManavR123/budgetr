@@ -12,6 +12,7 @@ import SpendingTable from "./SpendingTable.js";
 import Chart from "./Chart.js";
 import AddEntryModal from "./AddEntryModal.js";
 import "bootstrap/dist/css/bootstrap.min.css";
+import AddCategory from "./AddCategory.js";
 
 const styles = {
   addEntry: {
@@ -98,6 +99,7 @@ function Main({ user }) {
             <AddIcon />
           </IconButton>
         </div>
+        <AddCategory user={user} />
       </div>
       <div style={styles.child}>
         <Chart
