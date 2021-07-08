@@ -70,6 +70,11 @@ function AddEntryModal({ user, show, onClose, onSubmit }) {
     })
       .then(() => {
         onSubmit();
+        setDate(moment());
+        setAmount("");
+        setLocation("");
+        setCategory("");
+        setNotes("");
       })
       .catch((error) => console.log(error));
   };
