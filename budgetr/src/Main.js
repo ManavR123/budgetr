@@ -84,6 +84,9 @@ function Main({ user }) {
           startDate={startDate}
           endDate={endDate}
           update={update}
+          onDelete={() => {
+            setUpdate(update + 1);
+          }}
         />
         <div style={styles.addEntry}>
           Add an Entry{" "}

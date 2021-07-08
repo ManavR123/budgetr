@@ -119,6 +119,28 @@ int main(int argc, char *argv[]) {
         return crow::response(200);
       });
 
+  CROW_ROUTE(app, "/delete_purchase")
+      .methods("POST"_method)([&](const crow::request &req) {
+        auto body = crow::json::load(req.body);
+        auto id = body["id"].u();
+        const std::string username = body["username"].s();
+
+        transaction t(db->begin());
+        try {
+          auto pur(db->load<purchase>(id));
+          if (pur->get_username().compare(username) != 0) {
+            return crow::response(400, "Purchase-Does-Not-Belong-To-User");
+          }
+
+          db->erase<purchase>(id);
+          t.commit();
+          return crow::response(200);
+        } catch (const odb::exception &e) {
+          cerr << e.what() << endl;
+          return crow::response(400, "Purchase-Id-Does-Not-Exist");
+        }
+      });
+
   CROW_ROUTE(app, "/get_purchases")
       .methods("POST"_method)([&](const crow::request &req) {
         auto body = crow::json::load(req.body);

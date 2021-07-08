@@ -23,11 +23,7 @@ const useStyles = makeStyles({
 
 const COLUMNS = ["Date", "Amount", "Location", "Category", "Notes", "Delete"];
 
-const deleteData = (id) => {
-  console.log(id);
-};
-
-function SpendingTable({ user, startDate, endDate, update }) {
+function SpendingTable({ user, startDate, endDate, update, onDelete }) {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
@@ -62,128 +58,23 @@ function SpendingTable({ user, startDate, endDate, update }) {
       .catch((error) => console.log(error));
   }, [startDate, endDate, update]);
 
-  // const rows = [
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "1",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "2",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "3",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "4",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "5",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "4",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "5",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "4",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "5",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "4",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "5",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "4",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "5",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "4",
-  //   },
-  //   {
-  //     date: "1-Jul",
-  //     amount: "$2.65",
-  //     location: "Taco Bell",
-  //     category: "Food",
-  //     notes: "Lunch with friend",
-  //     id: "5",
-  //   },
-  // ];
+  const deleteData = (id) => {
+    fetch("/delete_purchase", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: user.username,
+        id,
+      }),
+    })
+      .then(() => {
+        onDelete();
+      })
+      .catch((error) => console.log(error));
+  };
 
   const classes = useStyles();
 
