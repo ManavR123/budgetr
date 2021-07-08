@@ -164,9 +164,10 @@ int main(int argc, char *argv[]) {
         }
 
         transaction t(db->begin());
-        result r(db->query<purchase>(query::username == username &&
-                                     query::date >= date1 &&
-                                     query::date <= date2));
+        result r(
+            db->query<purchase>((query::username == username &&
+                                 query::date >= date1 && query::date <= date2) +
+                                "ORDER BY" + query::date));
 
         std::vector<string> locations, categories, notes, dates;
         std::vector<float> amounts;
