@@ -93,7 +93,6 @@ function AddEntryModal({ user, show, onClose, onSubmit }) {
                 variant="inline"
                 format="MM/dd/yyyy"
                 margin="normal"
-                id="date-picker-inline"
                 label="Date"
                 value={date}
                 onChange={setDate}

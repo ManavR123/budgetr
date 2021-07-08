@@ -57,7 +57,6 @@ function Main({ user }) {
               variant="inline"
               format="MM/dd/yyyy"
               margin="normal"
-              id="date-picker-inline"
               label="Start Date"
               value={startDate}
               onChange={(value) => setStartDate(moment(value))}
@@ -70,7 +69,6 @@ function Main({ user }) {
               variant="inline"
               format="MM/dd/yyyy"
               margin="normal"
-              id="date-picker-inline"
               label="End Date"
               value={endDate}
               onChange={(value) => setEndDate(moment(value))}
